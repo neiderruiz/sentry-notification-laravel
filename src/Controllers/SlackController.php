@@ -12,13 +12,12 @@ class SlackController
             return;
         }
 
-        $response = Http::withHeaders(
+        Http::withHeaders(
             [
                 'Content-Type' => 'application/json',
             ]
         )->post(config('slack-config.slack.webhook_endpoint'), $payload);
-        dd($response, config('slack-config.slack.webhook_endpoint'), $payload);
-        dd(config('slack-config.slack.webhook_endpoint'));
+
     }
 
 
@@ -33,6 +32,6 @@ class SlackController
         $paylaod = SentryController::createMessage($eventId);
 
         SlackController::sendMessage($paylaod);
-        dd($paylaod, 'neider');
+
     }
 }
