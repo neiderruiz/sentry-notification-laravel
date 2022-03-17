@@ -1,5 +1,5 @@
 {
-    "name": "neiderruiz/sentry_nofification_laravel",
+    "name": "neiderruiz/sentry_notification_laravel",
     "description": "Send Sentry events to Slack",
     "license": "GPL",
     "autoload": {
