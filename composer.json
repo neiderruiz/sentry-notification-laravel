@@ -1,0 +1,34 @@
+{
+    "name": "neiderruiz/sentry_nofification_laravel",
+    "description": "Send Sentry events to Slack",
+    "license": "GPL",
+    "autoload": {
+        "psr-4": {
+            "Neiderruiz\\SentryNotificationLaravel\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Neider Ruiz",
+            "email": "57574910+neiderruiz@users.noreply.github.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5.10"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Neiderruiz\\SentryNotificationLaravel\\Tests\\": "tests"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/neiderruiz/sentry_notification_laravel"
+        }
+    ]
+}
