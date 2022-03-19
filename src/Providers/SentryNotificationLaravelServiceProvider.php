@@ -3,7 +3,6 @@
 namespace Neiderruiz\SentryNotificationLaravel\Providers;
 
 
-
 use Illuminate\Support\ServiceProvider;
 
 class SentryNotificationLaravelServiceProvider extends ServiceProvider

@@ -14,7 +14,7 @@ class SentryController
         $SENTRY_PROJECT = config('slack-config.sentry.project');
         $url_sentry = "$SENTRY_URL_API/$SENTRY_ORGANIZATION/$SENTRY_PROJECT/events/$eventId/";
 
-        $token_bearer = 'Bearer ' . env('SENTRY_TOKEN');
+        $token_bearer = 'Bearer ' . config('slack-config.sentry.token');
         $response = Http::withHeaders(
             [
                 'Authorization' => $token_bearer,
@@ -22,6 +22,7 @@ class SentryController
             ]
 
         )->get($url_sentry);
+
 
         return $response->json();
     }
@@ -50,107 +51,19 @@ class SentryController
         return true;
     }
 
-    static function createMessage(string $eventId)
+    static function findErrorSentry(string $eventId)
     {
-        // variables
-        $SENTRY_URL_API = config('slack-config.sentry.url_api');
-        $SENTRY_ORGANIZATION = config('slack-config.sentry.organization');
-        $SENTRY_PROJECT = config('slack-config.sentry.project');
-        $url_sentry = "$SENTRY_URL_API/$SENTRY_ORGANIZATION/$SENTRY_PROJECT/events/$eventId/";
+        if (self::verifiedEnviroments()) {
 
-        for ($i = 0; $i <= 10; $i++) {
-            sleep(2);
-            $response = self::searchEventId($eventId);
-            if (!isset($response['detail'])) {
-                $i = 10;
+            for ($i = 0; $i <= 10; $i++) {
+                sleep(2);
+                $response = self::searchEventId($eventId);
+                if (!isset($response['detail'])) {
+                    $i = 10;
+                }
             }
+
+            return $response;
         }
-
-        if (isset($response['detail'])) {
-            $payload = [
-                'attachments' => [
-                    [
-                        'mrkdwn_in' => ['text'],
-                        'color' => '#FF0000',
-                        'pretext' => 'Evento no encontrado',
-                        'text' => 'Informacion del error',
-                        'actions' => [
-                            [
-                                'type' => 'button',
-                                'text' => 'Ver error ⇗',
-                                'style' => 'danger',
-                                'url' => $url_sentry,
-                            ],
-                        ],
-                    ]
-                ],
-            ];
-        } else {
-
-            $issue = $response['groupID'];
-            $url_error = "https://sentry.io/organizations/$SENTRY_ORGANIZATION/issues/$issue/";
-            $messare_error = $response['metadata']['type'];
-            $subtitle_error = $response['metadata']['value'];
-            $title = "*<$url_error|$messare_error>*";
-            $time = $response['dateReceived'];
-            $user_email    = $response['user']['email'];
-            $user_id = $response['user']['id'];
-            $user_ip = $response['user']['ip_address'];
-            $error_url = $response['culprit'];
-            $type = $response['type'];
-
-            $payload =  [
-                'attachments' => [
-                    [
-                        'mrkdwn_in' => ['text'],
-                        'color' => '#FF0000',
-                        'pretext' => $title,
-                        'text' => $subtitle_error,
-                        'fields' => [
-                            [
-                                'title' => "Tipo: $type",
-                                'value' => "Hora: $time",
-                                'short' => false,
-                            ],
-                            [
-                                'title' => "Usuario:",
-                                'value' => $user_email ? $user_email : 'null',
-                                'short' => true,
-                            ],
-                            [
-                                'title' => "id:",
-                                'value' => $user_id ? $user_id : 'null',
-                                'short' => true,
-                            ],
-                            [
-                                'title' => "Ip_user:",
-                                'value' => $user_ip ? $user_ip : 'null',
-                                'short' => true,
-                            ],
-                            [
-                                'title' => "*ENPOINT ERROR*",
-                                'value' => $error_url,
-                                'short' => false,
-                            ],
-                        ],
-
-                        'actions' => [
-                            [
-                                'type' => 'button',
-                                'text' => 'Ver error ⇗',
-                                'style' => 'danger',
-                                'url' => $url_error,
-                            ],
-                        ],
-                        'footer' => 'Sentry',
-                        'footer_icon' => 'https://avatars.slack-edge.com/2020-04-24/1109268338864_716700387c3d322eab67_512.png',
-                        'ts' => 'ts',
-
-                    ],
-                ],
-            ];
-        }
-
-        return $payload;
     }
 }
